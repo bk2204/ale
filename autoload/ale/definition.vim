@@ -109,6 +109,8 @@ function! s:OnReady(line, column, options, capability, linter, lsp_details) abor
             let l:message = ale#lsp#message#Definition(l:buffer, a:line, a:column)
         elseif a:capability is# 'typeDefinition'
             let l:message = ale#lsp#message#TypeDefinition(l:buffer, a:line, a:column)
+        elseif a:capability is# 'implementation'
+            let l:message = ale#lsp#message#Implementation(l:buffer, a:line, a:column)
         else
             " XXX: log here?
             return
@@ -156,6 +158,20 @@ function! ale#definition#GoToType(options) abort
     endfor
 endfunction
 
+function! ale#definition#GoToImplementation(options) abort
+    for l:linter in ale#linter#Get(&filetype)
+        if !empty(l:linter.lsp)
+            " TODO: handle typeDefinition for tsserver if supported by the
+            " protocol
+            if l:linter.lsp is# 'tsserver'
+                continue
+            endif
+
+            call s:GoToLSPDefinition(l:linter, a:options, 'implementation')
+        endif
+    endfor
+endfunction
+
 function! ale#definition#GoToCommandHandler(command, ...) abort
     let l:options = {}
 
@@ -179,7 +195,9 @@ function! ale#definition#GoToCommandHandler(command, ...) abort
         endif
     endif
 
-    if a:command is# 'type'
+    if a:command is# 'implementation'
+        call ale#definition#GoToImplementation(l:options)
+    elseif a:command is# 'type'
         call ale#definition#GoToType(l:options)
     else
         call ale#definition#GoTo(l:options)

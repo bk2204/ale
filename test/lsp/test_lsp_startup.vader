@@ -188,6 +188,9 @@ Before:
       \           'typeDefinition': {
       \             'dynamicRegistration': v:false,
       \           },
+      \           'implementation': {
+      \             'dynamicRegistration': v:false,
+      \           },
       \           'publishDiagnostics': {
       \             'relatedInformation': v:true,
       \           },
